@@ -9,6 +9,11 @@ custom:
     stats: false          # Don't print out any Webpack output
     linting: false        # Disable linting as a part of the build process
 
+# Create our resources with separate CloudFormation templates
+resource:
+  # API Gateway Errors
+  - ${file(resources/api-gateway-errors.yml)}
+
 # Create an optimized package for our functions 
 package:
   individually: true
@@ -23,13 +28,6 @@ provider:
   runtime: nodejs10.x
   stage: dev
   region: us-east-1
-  # To load environment variables externally
-  # rename env.example to .env and uncomment
-  # the following line. Also, make sure to not
-  # commit your .env.
-  #
-  #environment:
-  #  SAMPLE_ENV_VAR: ${env:SAMPLE_ENV_VAR}
   environment:
     tableName: notes
     stripeSecretKey: ${env:STRIPE_SECRET_KEY}
@@ -54,6 +52,7 @@ functions:
           path: notes
           method: post
           authorizer: aws_iam
+          cors: true
   get:
     handler: lambda-functions/get.main
     events:
@@ -61,6 +60,7 @@ functions:
           path: notes/{id}
           method: get
           authorizer: aws_iam
+          cors: true
   list:
     handler: lambda-functions/list.main
     events:
@@ -68,6 +68,7 @@ functions:
           path: notes
           method: get
           authorizer: aws_iam
+          cors: true
   update:
     handler: lambda-functions/update.main
     events:
@@ -75,6 +76,7 @@ functions:
           path: notes/{id}
           method: put
           authorizer: aws_iam
+          cors: true
   delete:
     handler: lambda-functions/delete.main
     events:
@@ -82,6 +84,7 @@ functions:
           path: notes/{id}
           method: delete
           authorizer: aws_iam
+          cors: true
   billing:
     handler: lambda-functions/billing.main
     events:
@@ -89,3 +92,4 @@ functions:
           path: billing
           method: post
           authorizer: aws_iam
+          cors: true
