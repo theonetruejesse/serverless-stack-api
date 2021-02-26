@@ -1,6 +1,14 @@
 # NOTE: update this with your service name
 service: notes-api
 
+custom:
+  # for serverless-bundle -- webpack wrapper
+  bundle:
+    sourcemaps: true      # Enable source maps
+    caching: false        # While in development don't cache
+    stats: false          # Don't print out any Webpack output
+    linting: false        # Disable linting as a part of the build process
+
 # Create an optimized package for our functions 
 package:
   individually: true
@@ -24,6 +32,7 @@ provider:
   #  SAMPLE_ENV_VAR: ${env:SAMPLE_ENV_VAR}
   environment:
     tableName: notes
+    stripeSecretKey: ${env:STRIPE_SECRET_KEY}
 
   iamRoleStatements:
     - Effect: Allow
@@ -72,4 +81,11 @@ functions:
       - http:
           path: notes/{id}
           method: delete
+          authorizer: aws_iam
+  billing:
+    handler: lambda-functions/billing.main
+    events:
+      - http:
+          path: billing
+          method: post
           authorizer: aws_iam
